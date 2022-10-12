@@ -1,0 +1,26 @@
+*{
+    padding: 0;
+    margin: 0;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
+}
+body{
+margin: 0;
+  padding: 0;
+  background: linear-gradient(120deg,#488dbc, #8e44ad);
+  height: 100vh;
+  overflow: hidden;
+  align-items: center;
+  text-align: center;
+
+}
+.content{
+position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  background: transparent;
+  border-radius: 10px;
+  box-shadow: 10px 10px 15px rgba(0,0,0,0.05);
+}

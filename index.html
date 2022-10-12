@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Login | Form</title>
+    <link rel="stylesheet" href="login-style.css">
+  </head>
+  <body>
+    <div class="center">
+      <h1>Welcome Master Charlie</h1>
+      <form 
+      target="_blank" 
+      name="Form" 
+      onsubmit="return validate();" 
+      method="get"
+      
+      >
+      
+        <div class="txt_field">
+          <input type="text" id="email" required>
+          <span></span>
+          <label>Email</label>
+        </div>
+        <div class="txt_field">
+          <input type="password" id="password" required>
+          <span></span>
+          <label>Password</label>
+        </div>
+        
+        <input type="submit" value="Submit">
+        <div class="signup_link">
+          Wanna Join me? <a href="/register.html">Signup</a>
+        </div>
+      </form>
+    </div>
+    <script>
+      function validate(){
+        var email = document.getElementById("email").value;
+        var password = document.getElementById("password").value;
+          
+        if(email == "nagaseuc@gmail.com" && password == "VaiOla2022"){
+          window.location.assign("homepage.html");
+          alert("Welcome Mr Ah Kuoi")
+        }
+        else{
+          alert("You are not Mr Ah Kuoi(Invalid Informations)...")
+          return;
+        }
+
+          }
+          
+    </script>
+  </body>
+</html>

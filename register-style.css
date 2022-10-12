@@ -1,0 +1,267 @@
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+
+}
+body{
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url(/images/one-only-the-palm-dubai-dubai-united-arab-emirates-112572-1.jpg);
+  background-repeat: none;
+  background-size: cover;
+}
+.container{
+  position: relative;
+  max-width: 900px;
+  width: 100%;
+  border-radius: 6px;
+  padding: 30px;
+  margin: 0 15px;
+  background-color: white;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 1);
+}
+
+.container header{
+  font-size: 20px;
+  font-weight: 600;
+  color: #333; 
+  margin-bottom: -10px; 
+  
+}
+.container header span{
+  text-decoration: underline;
+  color: red;
+  font-size: 22px;
+  
+}
+.container header::before{
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 3px;
+  width: 27px;
+  border-radius: 8px;
+  background-color: #4070f4;
+}
+.container form{
+  position: relative;
+  margin-top: 16px;
+  min-height: 300px;
+  background-color: white;
+}
+.container form .details{
+  margin-top: 30px;
+}
+.container form .title{
+  padding: 10px;
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 6px 0;
+  color: #333;
+  background-color: beige;
+  font-weight: bold;
+
+}
+.container form .input-field{
+  display: flex;
+  width: calc(100% / 3 - 15px);
+  flex-direction: column;   
+  margin: 4px 0;
+  
+}
+
+.container form .fields{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.input-field label{
+  font-size: 12px;
+  font-weight: bold;
+  color: #2e2e2e;
+
+}
+
+.input-field input{
+  
+  outline: none;
+  font-size: 14px; 
+  font-weight: 400;
+  border-radius: 5px;
+  color: #333;
+  border: 1px solid #aaa;
+  padding: 0 15px;
+  height: 42px;
+  margin: 8px 0;
+}
+
+.input-field input:is(:focus, :valid){
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.13);
+
+}
+.input-field input[type="date"]{
+  color: #707070;
+}
+.input-field input[type="date"]:valid{
+  color: #333;
+}
+.custom_select{
+  position: relative;
+  width: 100%;
+  height: 58px;
+}
+.custom_select select{
+  color: #707070;
+  font-size: 14px;
+  font-weight: 400;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;   
+  margin: 8px 0;
+ -webkit-appearance: none;
+ appearance: none;
+ border: 1px solid #aaa;
+ width: 100%;
+ height: 42px;
+ padding: 12px;
+ outline: none;
+ 
+
+}
+.custom_select:before{
+  vertical-align: middle;
+  content: "";
+  position: absolute;
+  top: 22px;
+  right: 10px;
+  border: 8px solid;
+  border-color: red transparent transparent transparent;
+  pointer-events: none;
+
+}
+.container form button{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 45px;
+  max-width: 200px;
+  width: 100%;
+  border: none;
+  outline: none;
+  color: #fff;
+  border-radius: 5px;
+  margin: 25px 0;
+  background-color: #4070f4;
+  transition: all 0.3s linear;
+  cursor: pointer;
+  margin-right: 14px;
+
+}
+.button-next .cancel a{
+  text-decoration: none;
+  color: #fff;
+}
+
+form button:hover{
+  background-color: #022482;
+
+}
+form button i{
+  margin: 0 6px;
+}
+
+.enrol-foundation{
+  font-family: 'Times New Roman', Times, serif;
+  height: 100%;
+  padding: 10px 20px;
+  font-size: 12px;
+}
+.enrol-foundation span{
+  text-decoration: underline;
+  color: #265df2;
+}
+
+form h1{
+  font-size: 20px;
+  padding-bottom: 10px;
+  width: 100%;
+}
+.input-field-terms label{
+  font-size: 12px;
+  font-weight: bold;
+  color: #2e2e2e;
+  margin-left: 100px;
+
+}
+.container form .input-field-terms{
+  display: flex;
+  width: calc(100% / 3 - 15px);
+  flex-direction: column;   
+  margin: 4px 0;
+  
+}
+
+.container form .fields{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+     
+
+}
+.input-field-terms input{
+  outline: none;
+  font-size: 14px; 
+  font-weight: 400;
+  border-radius: 5px;
+  color: #333;
+  padding: 0 15px;
+  width: 50px;
+  height: 42px;
+  margin: 8px 0;
+  margin-left: 100px;
+}
+.input-field-course input{
+  outline: none;
+  font-size: 14px; 
+  font-weight: 400;
+  border-radius: 5px;
+  color: #333;
+  border: 1px solid #aaa;
+  padding: 0 15px;
+  height: 42px;
+  margin: 8px 0;
+  width: 350px;
+}
+.container form .input-field-course{
+  display: flex;
+  width: calc(100% / 3 - 15px);
+  flex-direction: column;   
+  margin: 4px 0;
+  
+}
+.input-field-course label{
+  font-size: 12px;
+  font-weight: bold;
+  color: #2e2e2e;
+
+}
+
+.button-next{
+  display: flex;
+  align-items: center;
+  width: 400px;
+
+}
+
+.button-next button{
+  margin-left: 14px;
+}

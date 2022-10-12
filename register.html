@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign | Up</title>
+    <link rel="stylesheet" href="/register-style.css">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+</head>
+<body>
+    <div class="container">
+        <header>Sign <SPAN>Up</SPAN></header>
+        <form name="Form" action="confirm.html" onsubmit="return validateForm();" method="get">
+        
+            <div class="form first">
+                <div class="details personal">
+                    <span class="title">REGISTRATION</span>
+
+                    <div class="fields">
+                        <div class="input-field">
+                            <label>Full Name:</label>
+                             <input type="text" id="name" placeholder="Enter full name" required>
+                        </div>
+                        <div class="input-field">
+                          <label>Gender</label>
+                          <div class="custom_select">
+                              <select>
+                              <option value="">Select</option>
+                              <option value="Male">Male</option>
+                              <option value="Female">Female</option>
+                              <option value="other">Prefer not to say</option>
+                              </select>
+                          </div>
+                          </div>
+                        <div class="input-field">
+                            <label>Village:</label>
+                             <input type="text" placeholder="Enter village name" required>
+                        </div>
+                        <div class="input-field">
+                            <label>Birth Date:</label>
+                             <input type="date" placeholder="Enter your Birth date" required>
+                        </div>
+
+                        <div class="input-field">
+                            <label>Phone number (landline or cellphone):</label>
+                             <input type="text" placeholder="Enter your phone number" required>
+                        </div>
+                        <div class="input-field">
+                            <label>Email</label>
+                             <input type="text" placeholder="Enter your email address" name="email" required>
+                        </div>
+                        <div class="button-next">
+                            <button type="reset" class="cancel"><a href="/index.html">Cancel</a></button>
+                            <button type="submit" class="submit">Submit</button>
+                          </div> 
+                        
+                      </div>
+                </div>
+        </form>
+        <script>
+          function validateForm(){
+        var x=document.forms["Form"]["email"].value;
+        var atpos=x.indexOf("@");
+        var dotpos=x.lastIndexOf(".com");
+        if(atpos<1 || dotpos<atpos+2 || dotpos+2>x.length)
+            {
+                alert("Not a valid e-mail address, please enter a valid email address");
+                return false;
+            
+            }
+
+    var regName = /^[a-zA-Z]+ [a-zA-Z]+$/;
+    var name = document.getElementById('name').value;
+    if(!regName.test(name)){
+        alert('Please enter your full name (first & last name).');
+        document.getElementById('name').focus();
+        return false;
+    }else{
+        alert('Valid name given.');
+        return true;
+    }
+    }
+        </script>
+    
+</body>
+</html>
