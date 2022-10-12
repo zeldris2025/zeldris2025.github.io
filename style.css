@@ -2099,7 +2099,7 @@ img {
   padding-top: 0px;
   color: red;
   font-size: 50px;
-  font-weight: 400;
+  font-weight: 100;
   letter-spacing: 3px;
   text-transform: uppercase;
   text-shadow: 3px black;
@@ -2114,7 +2114,7 @@ img {
   outline-offset: 0px;
   outline-style: none;
   outline-width: 3px;
-  color: black;
+  color: white;
   font-style: italic;
   text-decoration: underline;
   background-clip: border-box;
@@ -2337,11 +2337,8 @@ img {
 
 .banner {
   height: 100%;
-  background-color: #fff;
-  background-image: url("https://uploads-ssl.webflow.com/633b92064fb6f9dbd4a6f4ee/633bf12df1f08565caa8c6cf_2690549.jpg"),
-    -webkit-gradient(linear, left top, left bottom, from(rgba(0, 0, 0, 0.5)), to(rgba(0, 0, 0, 0.5)));
-  background-image: url("https://uploads-ssl.webflow.com/633b92064fb6f9dbd4a6f4ee/633bf12df1f08565caa8c6cf_2690549.jpg"),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
+ 
+  linear-gradient(180deg, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5));
   background-position: 0px 0px, 0px 0px;
   background-size: cover, auto;
   opacity: 1;
@@ -2353,9 +2350,10 @@ img {
 
 .content {
   height: 100%;
-  background-image: url("https://uploads-ssl.webflow.com/633b92064fb6f9dbd4a6f4ee/633b92074fb6f9beb8a6f50a_4e769802-500px.jpg");
+  background-image: url(/images/life-resort-house-architecture-wallpaper-preview.jpg);
   background-position: 0px 0px;
-  background-size: auto;
+  background-size: cover;
+  background-repeat: no-repeat;
   align-items: center;
   text-align: center;
 }
@@ -2637,10 +2635,14 @@ img {
   --deft:100px;
 }
 .wrapper{
+ 
+  height: 100%;
+  margin: 0;
   margin-top: -150px;
   perspective:1000px;
 }
 .cube-box{
+  
   width: 200px;
   height: 200px;
   margin: auto;
