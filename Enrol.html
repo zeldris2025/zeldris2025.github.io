@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign | Up</title>
+    <title>Enrol | Course</title>
     <link rel="stylesheet" href="/register-style.css">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
 </head>
 <body>
     <div class="container">
-        <header>Sign <SPAN>Up</SPAN></header>
+        <header>Enroll <SPAN>Now</SPAN></header>
         <form name="Form" action="confirm.html" onsubmit="return validateForm();" method="get">
         
             <div class="form first">
@@ -33,10 +33,18 @@
                               </select>
                           </div>
                           </div>
-                        <div class="input-field">
-                            <label>Village:</label>
-                             <input type="text" placeholder="Enter village name" required>
-                        </div>
+                          <div class="input-field">
+                            <label>Course (Pick one)</label>
+                            <div class="custom_select">
+                                <select>
+                                <option value="">Select</option>
+                                <option value="ITE">ITE</option>
+                                <option value="CCNA1">CCNA1</option>
+                                <option value="CCNA2">CCNA2</option>
+                                <option value="CCNA3">CCNA3</option>
+                                </select>
+                            </div>
+                            </div>
                         <div class="input-field">
                             <label>Birth Date:</label>
                              <input type="date" placeholder="Enter your Birth date" required>

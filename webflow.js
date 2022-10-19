@@ -1344,7 +1344,7 @@
    __webpack_require__(13);
    __webpack_require__(14);
    __webpack_require__(19);
-   module.exports = __webpack_require__(20);
+   module.exports = __webpack_require__(22);
    
    
    /***/ }),
@@ -1384,7 +1384,7 @@
          shouldBrand = true;
        }
    
-      
+       
      };
    
      function onFullScreenChange() {
@@ -1392,7 +1392,16 @@
        $(brandElement).attr('style', fullScreen ? 'display: none !important;' : '');
      }
    
-    
+     function createBadge() {
+       var $brand = $('<a class="w-webflow-badge"></a>').attr('href', 'https://webflow.com?utm_campaign=brandjs');
+       var $logoArt = $('<img>').attr('src', 'https://d3e54v103j8qbb.cloudfront.net/img/webflow-badge-icon.f67cd735e3.svg').attr('alt', '').css({
+         marginRight: '8px',
+         width: '16px'
+       });
+       var $logoText = $('<img>').attr('src', 'https://d1otoma47x30pg.cloudfront.net/img/webflow-badge-text.6faa6a38cd.svg').attr('alt', 'Made in Webflow');
+       $brand.append($logoArt, $logoText);
+       return $brand[0];
+     }
    
      function ensureBrand() {
        var found = $body.children(namespace);
@@ -3054,7 +3063,7 @@
      var namespace = '.w-form';
      var siteId;
      var emailField = /e(-)?mail/i;
-     var emailValue = /^\S+@\S+.com/;
+     var emailValue = /^\S+@\S+$/;
      var alert = window.alert;
      var inApp = Webflow.env();
      var listening;
@@ -3298,7 +3307,6 @@
    
      function getStatus(field, type, name, value) {
        var status = null;
-       
    
        if (type === 'password') {
          status = 'Passwords cannot be submitted.';
@@ -3757,794 +3765,6 @@
    "use strict";
     // @wf-will-never-add-flow-to-this-file
    
-   /* globals window, document, jQuery */
-   
-   /* eslint-disable no-var */
-   
-   /**
-    * Webflow: Lightbox component
-    */
-   
-   var Webflow = __webpack_require__(0);
-   
-   var CONDITION_INVISIBLE_CLASS = 'w-condition-invisible';
-   var CONDVIS_SELECTOR = '.' + CONDITION_INVISIBLE_CLASS;
-   
-   function withoutConditionallyHidden(items) {
-     return items.filter(function (item) {
-       return !isConditionallyHidden(item);
-     });
-   }
-   
-   function isConditionallyHidden(item) {
-     return Boolean(item.$el && item.$el.closest(CONDVIS_SELECTOR).length);
-   }
-   
-   function getPreviousVisibleIndex(start, items) {
-     for (var i = start; i >= 0; i--) {
-       if (!isConditionallyHidden(items[i])) {
-         return i;
-       }
-     }
-   
-     return -1;
-   }
-   
-   function getNextVisibleIndex(start, items) {
-     for (var i = start; i <= items.length - 1; i++) {
-       if (!isConditionallyHidden(items[i])) {
-         return i;
-       }
-     }
-   
-     return -1;
-   }
-   
-   function shouldSetArrowLeftInactive(currentIndex, items) {
-     return getPreviousVisibleIndex(currentIndex - 1, items) === -1;
-   }
-   
-   function shouldSetArrowRightInactive(currentIndex, items) {
-     return getNextVisibleIndex(currentIndex + 1, items) === -1;
-   }
-   
-   function setAriaLabelIfEmpty($element, labelText) {
-     if (!$element.attr('aria-label')) {
-       $element.attr('aria-label', labelText);
-     }
-   }
-   
-   function createLightbox(window, document, $, container) {
-     var tram = $.tram;
-     var isArray = Array.isArray;
-     var namespace = 'w-lightbox';
-     var prefix = namespace + '-';
-     var prefixRegex = /(^|\s+)/g; // Array of objects describing items to be displayed.
-   
-     var items = []; // Index of the currently displayed item.
-   
-     var currentIndex; // Object holding references to jQuery wrapped nodes.
-   
-     var $refs; // Instance of Spinner
-   
-     var spinner; // Tracks data on element visiblity modified when lightbox opens
-   
-     var resetVisibilityState = [];
-   
-     function lightbox(thing, index) {
-       items = isArray(thing) ? thing : [thing];
-   
-       if (!$refs) {
-         lightbox.build();
-       }
-   
-       if (withoutConditionallyHidden(items).length > 1) {
-         $refs.items = $refs.empty;
-         items.forEach(function (item, idx) {
-           var $thumbnail = dom('thumbnail');
-           var $item = dom('item').prop('tabIndex', 0).attr('aria-controls', 'w-lightbox-view').attr('role', 'tab').append($thumbnail);
-           setAriaLabelIfEmpty($item, "show item ".concat(idx + 1, " of ").concat(items.length));
-   
-           if (isConditionallyHidden(item)) {
-             $item.addClass(CONDITION_INVISIBLE_CLASS);
-           }
-   
-           $refs.items = $refs.items.add($item);
-           loadImage(item.thumbnailUrl || item.url, function ($image) {
-             if ($image.prop('width') > $image.prop('height')) {
-               addClass($image, 'wide');
-             } else {
-               addClass($image, 'tall');
-             }
-   
-             $thumbnail.append(addClass($image, 'thumbnail-image'));
-           });
-         });
-         $refs.strip.empty().append($refs.items);
-         addClass($refs.content, 'group');
-       }
-   
-       tram( // Focus the lightbox to receive keyboard events.
-       removeClass($refs.lightbox, 'hide').trigger('focus')).add('opacity .3s').start({
-         opacity: 1
-       }); // Prevent document from scrolling while lightbox is active.
-   
-       addClass($refs.html, 'noscroll');
-       return lightbox.show(index || 0);
-     }
-     /**
-      * Creates the DOM structure required by the lightbox.
-      */
-   
-   
-     lightbox.build = function () {
-       // In case `build` is called more than once.
-       lightbox.destroy();
-       $refs = {
-         html: $(document.documentElement),
-         // Empty jQuery object can be used to build new ones using `.add`.
-         empty: $()
-       };
-       $refs.arrowLeft = dom('control left inactive').attr('role', 'button').attr('aria-hidden', true).attr('aria-controls', 'w-lightbox-view');
-       $refs.arrowRight = dom('control right inactive').attr('role', 'button').attr('aria-hidden', true).attr('aria-controls', 'w-lightbox-view');
-       $refs.close = dom('control close').attr('role', 'button'); // Only set `aria-label` values if not already present
-   
-       setAriaLabelIfEmpty($refs.arrowLeft, 'previous image');
-       setAriaLabelIfEmpty($refs.arrowRight, 'next image');
-       setAriaLabelIfEmpty($refs.close, 'close lightbox');
-       $refs.spinner = dom('spinner').attr('role', 'progressbar').attr('aria-live', 'polite').attr('aria-hidden', false).attr('aria-busy', true).attr('aria-valuemin', 0).attr('aria-valuemax', 100).attr('aria-valuenow', 0).attr('aria-valuetext', 'Loading image');
-       $refs.strip = dom('strip').attr('role', 'tablist');
-       spinner = new Spinner($refs.spinner, prefixed('hide'));
-       $refs.content = dom('content').append($refs.spinner, $refs.arrowLeft, $refs.arrowRight, $refs.close);
-       $refs.container = dom('container').append($refs.content, $refs.strip);
-       $refs.lightbox = dom('backdrop hide').append($refs.container); // We are delegating events for performance reasons and also
-       // to not have to reattach handlers when images change.
-   
-       $refs.strip.on('click', selector('item'), itemTapHandler);
-       $refs.content.on('swipe', swipeHandler).on('click', selector('left'), handlerPrev).on('click', selector('right'), handlerNext).on('click', selector('close'), handlerHide).on('click', selector('image, caption'), handlerNext);
-       $refs.container.on('click', selector('view'), handlerHide) // Prevent images from being dragged around.
-       .on('dragstart', selector('img'), preventDefault);
-       $refs.lightbox.on('keydown', keyHandler) // IE loses focus to inner nodes without letting us know.
-       .on('focusin', focusThis);
-       $(container).append($refs.lightbox);
-       return lightbox;
-     };
-     /**
-      * Dispose of DOM nodes created by the lightbox.
-      */
-   
-   
-     lightbox.destroy = function () {
-       if (!$refs) {
-         return;
-       } // Event handlers are also removed.
-   
-   
-       removeClass($refs.html, 'noscroll');
-       $refs.lightbox.remove();
-       $refs = undefined;
-     };
-     /**
-      * Show a specific item.
-      */
-   
-   
-     lightbox.show = function (index) {
-       // Bail if we are already showing this item.
-       if (index === currentIndex) {
-         return;
-       }
-   
-       var item = items[index];
-   
-       if (!item) {
-         return lightbox.hide();
-       }
-   
-       if (isConditionallyHidden(item)) {
-         if (index < currentIndex) {
-           var previousVisibleIndex = getPreviousVisibleIndex(index - 1, items);
-           index = previousVisibleIndex > -1 ? previousVisibleIndex : index;
-         } else {
-           var nextVisibleIndex = getNextVisibleIndex(index + 1, items);
-           index = nextVisibleIndex > -1 ? nextVisibleIndex : index;
-         }
-   
-         item = items[index];
-       }
-   
-       var previousIndex = currentIndex;
-       currentIndex = index;
-       $refs.spinner.attr('aria-hidden', false).attr('aria-busy', true).attr('aria-valuenow', 0).attr('aria-valuetext', 'Loading image');
-       spinner.show(); // For videos, load an empty SVG with the video dimensions to preserve
-       // the videoâ€™s aspect ratio while being responsive.
-   
-       var url = item.html && svgDataUri(item.width, item.height) || item.url;
-       loadImage(url, function ($image) {
-         // Make sure this is the last item requested to be shown since
-         // images can finish loading in a different order than they were
-         // requested in.
-         if (index !== currentIndex) {
-           return;
-         }
-   
-         var $figure = dom('figure', 'figure').append(addClass($image, 'image'));
-         var $frame = dom('frame').append($figure);
-         var $newView = dom('view').prop('tabIndex', 0).attr('id', 'w-lightbox-view').append($frame);
-         var $html;
-         var isIframe;
-   
-         if (item.html) {
-           $html = $(item.html);
-           isIframe = $html.is('iframe');
-   
-           if (isIframe) {
-             $html.on('load', transitionToNewView);
-           }
-   
-           $figure.append(addClass($html, 'embed'));
-         }
-   
-         if (item.caption) {
-           $figure.append(dom('caption', 'figcaption').text(item.caption));
-         }
-   
-         $refs.spinner.before($newView);
-   
-         if (!isIframe) {
-           transitionToNewView();
-         }
-   
-         function transitionToNewView() {
-           $refs.spinner.attr('aria-hidden', true).attr('aria-busy', false).attr('aria-valuenow', 100).attr('aria-valuetext', 'Loaded image');
-           spinner.hide();
-   
-           if (index !== currentIndex) {
-             $newView.remove();
-             return;
-           }
-   
-           var shouldHideLeftArrow = shouldSetArrowLeftInactive(index, items);
-           toggleClass($refs.arrowLeft, 'inactive', shouldHideLeftArrow);
-           toggleHidden($refs.arrowLeft, shouldHideLeftArrow);
-   
-           if (shouldHideLeftArrow && $refs.arrowLeft.is(':focus')) {
-             // Refocus on right arrow as left arrow is hidden
-             $refs.arrowRight.focus();
-           }
-   
-           var shouldHideRightArrow = shouldSetArrowRightInactive(index, items);
-           toggleClass($refs.arrowRight, 'inactive', shouldHideRightArrow);
-           toggleHidden($refs.arrowRight, shouldHideRightArrow);
-   
-           if (shouldHideRightArrow && $refs.arrowRight.is(':focus')) {
-             // Refocus on left arrow as right arrow is hidden
-             $refs.arrowLeft.focus();
-           }
-   
-           if ($refs.view) {
-             tram($refs.view).add('opacity .3s').start({
-               opacity: 0
-             }).then(remover($refs.view));
-             tram($newView).add('opacity .3s').add('transform .3s').set({
-               x: index > previousIndex ? '80px' : '-80px'
-             }).start({
-               opacity: 1,
-               x: 0
-             });
-           } else {
-             $newView.css('opacity', 1);
-           }
-   
-           $refs.view = $newView;
-           $refs.view.prop('tabIndex', 0);
-   
-           if ($refs.items) {
-             removeClass($refs.items, 'active');
-             $refs.items.removeAttr('aria-selected'); // Mark proper thumbnail as active
-   
-             var $activeThumb = $refs.items.eq(index);
-             addClass($activeThumb, 'active');
-             $activeThumb.attr('aria-selected', true); // Scroll into view
-   
-             maybeScroll($activeThumb);
-           }
-         }
-       });
-       $refs.close.prop('tabIndex', 0); // Track the focused item on page prior to lightbox opening,
-       // so we can return focus on hide
-   
-       $(':focus').addClass('active-lightbox'); // Build is only called once per site (across multiple lightboxes),
-       // while the show function is called when opening lightbox but also
-       // when changing image.
-       // So checking resetVisibilityState seems to be one approach to
-       // trigger something only when the lightbox is opened
-   
-       if (resetVisibilityState.length === 0) {
-         // Take all elements on the page out of the accessibility flow by marking
-         // them hidden and preventing tab index while lightbox is open.
-         $('body').children().each(function () {
-           // We don't include the lightbox wrapper or script tags
-           if ($(this).hasClass('w-lightbox-backdrop') || $(this).is('script')) {
-             return;
-           } // Store the elements previous visiblity state
-   
-   
-           resetVisibilityState.push({
-             node: $(this),
-             hidden: $(this).attr('aria-hidden'),
-             tabIndex: $(this).attr('tabIndex')
-           }); // Hide element from the accessiblity tree
-   
-           $(this).attr('aria-hidden', true).attr('tabIndex', -1);
-         }); // Start focus on the close icon
-   
-         $refs.close.focus();
-       }
-   
-       return lightbox;
-     };
-     /**
-      * Hides the lightbox.
-      */
-   
-   
-     lightbox.hide = function () {
-       tram($refs.lightbox).add('opacity .3s').start({
-         opacity: 0
-       }).then(hideLightbox);
-       return lightbox;
-     };
-   
-     lightbox.prev = function () {
-       var previousVisibleIndex = getPreviousVisibleIndex(currentIndex - 1, items);
-   
-       if (previousVisibleIndex > -1) {
-         lightbox.show(previousVisibleIndex);
-       }
-     };
-   
-     lightbox.next = function () {
-       var nextVisibleIndex = getNextVisibleIndex(currentIndex + 1, items);
-   
-       if (nextVisibleIndex > -1) {
-         lightbox.show(nextVisibleIndex);
-       }
-     };
-   
-     function createHandler(action) {
-       return function (event) {
-         // We only care about events triggered directly on the bound selectors.
-         if (this !== event.target) {
-           return;
-         }
-   
-         event.stopPropagation();
-         event.preventDefault();
-         action();
-       };
-     }
-   
-     var handlerPrev = createHandler(lightbox.prev);
-     var handlerNext = createHandler(lightbox.next);
-     var handlerHide = createHandler(lightbox.hide);
-   
-     var itemTapHandler = function itemTapHandler(event) {
-       var index = $(this).index();
-       event.preventDefault();
-       lightbox.show(index);
-     };
-   
-     var swipeHandler = function swipeHandler(event, data) {
-       // Prevent scrolling.
-       event.preventDefault();
-   
-       if (data.direction === 'left') {
-         lightbox.next();
-       } else if (data.direction === 'right') {
-         lightbox.prev();
-       }
-     };
-   
-     var focusThis = function focusThis() {
-       this.focus();
-     };
-   
-     function preventDefault(event) {
-       event.preventDefault();
-     }
-   
-     function keyHandler(event) {
-       var keyCode = event.keyCode; // [esc] or ([enter] or [space] while close button is focused)
-   
-       if (keyCode === 27 || checkForFocusTrigger(keyCode, 'close')) {
-         lightbox.hide(); // [â—€] or ([enter] or [space] while left button is focused)
-       } else if (keyCode === 37 || checkForFocusTrigger(keyCode, 'left')) {
-         lightbox.prev(); // [â–¶] or ([enter] or [space] while right button is focused)
-       } else if (keyCode === 39 || checkForFocusTrigger(keyCode, 'right')) {
-         lightbox.next(); // [enter] or [space] while a thumbnail is focused
-       } else if (checkForFocusTrigger(keyCode, 'item')) {
-         $(':focus').click();
-       }
-     }
-     /**
-      * checkForFocusTrigger will check if the current focused element includes the matching class
-      * and that the user has pressed either enter or space to trigger an action.
-      * @param  {number} The numerical keyCode from the `keydown` event
-      * @param  {string} The unique part of the `className` from the element we are checking. E.g. `close` will be prefixed into `w-lightbox-close`
-      * @return {boolean}
-      */
-   
-   
-     function checkForFocusTrigger(keyCode, classMatch) {
-       if (keyCode !== 13 && keyCode !== 32) {
-         return false;
-       }
-   
-       var currentElementClasses = $(':focus').attr('class');
-       var classToFind = prefixed(classMatch).trim();
-       return currentElementClasses.includes(classToFind);
-     }
-   
-     function hideLightbox() {
-       // If the lightbox hasn't been destroyed already
-       if ($refs) {
-         // Reset strip scroll, otherwise next lightbox opens scrolled to last position
-         $refs.strip.scrollLeft(0).empty();
-         removeClass($refs.html, 'noscroll');
-         addClass($refs.lightbox, 'hide');
-         $refs.view && $refs.view.remove(); // Reset some stuff
-   
-         removeClass($refs.content, 'group');
-         addClass($refs.arrowLeft, 'inactive');
-         addClass($refs.arrowRight, 'inactive');
-         currentIndex = $refs.view = undefined; // Bring the page elements back into the accessiblity tree
-   
-         resetVisibilityState.forEach(function (visibilityState) {
-           var node = visibilityState.node;
-   
-           if (!node) {
-             return;
-           }
-   
-           if (visibilityState.hidden) {
-             node.attr('aria-hidden', visibilityState.hidden);
-           } else {
-             node.removeAttr('aria-hidden');
-           }
-   
-           if (visibilityState.tabIndex) {
-             node.attr('tabIndex', visibilityState.tabIndex);
-           } else {
-             node.removeAttr('tabIndex');
-           }
-         }); // Clear out the reset visibility state
-   
-         resetVisibilityState = []; // Re-focus on the element that triggered the lightbox
-   
-         $('.active-lightbox').removeClass('active-lightbox').focus();
-       }
-     }
-   
-     function loadImage(url, callback) {
-       var $image = dom('img', 'img');
-       $image.one('load', function () {
-         callback($image);
-       }); // Start loading image.
-   
-       $image.attr('src', url);
-       return $image;
-     }
-   
-     function remover($element) {
-       return function () {
-         $element.remove();
-       };
-     }
-   
-     function maybeScroll($item) {
-       var itemElement = $item.get(0);
-       var stripElement = $refs.strip.get(0);
-       var itemLeft = itemElement.offsetLeft;
-       var itemWidth = itemElement.clientWidth;
-       var stripScrollLeft = stripElement.scrollLeft;
-       var stripWidth = stripElement.clientWidth;
-       var stripScrollLeftMax = stripElement.scrollWidth - stripWidth;
-       var newScrollLeft;
-   
-       if (itemLeft < stripScrollLeft) {
-         newScrollLeft = Math.max(0, itemLeft + itemWidth - stripWidth);
-       } else if (itemLeft + itemWidth > stripWidth + stripScrollLeft) {
-         newScrollLeft = Math.min(itemLeft, stripScrollLeftMax);
-       }
-   
-       if (newScrollLeft != null) {
-         tram($refs.strip).add('scroll-left 500ms').start({
-           'scroll-left': newScrollLeft
-         });
-       }
-     }
-     /**
-      * Spinner
-      */
-   
-   
-     function Spinner($spinner, className, delay) {
-       this.$element = $spinner;
-       this.className = className;
-       this.delay = delay || 200;
-       this.hide();
-     }
-   
-     Spinner.prototype.show = function () {
-       // eslint-disable-next-line no-shadow
-       var spinner = this; // Bail if we are already showing the spinner.
-   
-       if (spinner.timeoutId) {
-         return;
-       }
-   
-       spinner.timeoutId = setTimeout(function () {
-         spinner.$element.removeClass(spinner.className); // eslint-disable-next-line webflow/no-delete
-   
-         delete spinner.timeoutId;
-       }, spinner.delay);
-     };
-   
-     Spinner.prototype.hide = function () {
-       // eslint-disable-next-line no-shadow
-       var spinner = this;
-   
-       if (spinner.timeoutId) {
-         clearTimeout(spinner.timeoutId); // eslint-disable-next-line webflow/no-delete
-   
-         delete spinner.timeoutId;
-         return;
-       }
-   
-       spinner.$element.addClass(spinner.className);
-     };
-   
-     function prefixed(string, isSelector) {
-       return string.replace(prefixRegex, (isSelector ? ' .' : ' ') + prefix);
-     }
-   
-     function selector(string) {
-       return prefixed(string, true);
-     }
-     /**
-      * jQuery.addClass with auto-prefixing
-      * @param  {jQuery} Element to add class to
-      * @param  {string} Class name that will be prefixed and added to element
-      * @return {jQuery}
-      */
-   
-   
-     function addClass($element, className) {
-       return $element.addClass(prefixed(className));
-     }
-     /**
-      * jQuery.removeClass with auto-prefixing
-      * @param  {jQuery} Element to remove class from
-      * @param  {string} Class name that will be prefixed and removed from element
-      * @return {jQuery}
-      */
-   
-   
-     function removeClass($element, className) {
-       return $element.removeClass(prefixed(className));
-     }
-     /**
-      * jQuery.toggleClass with auto-prefixing
-      * @param  {jQuery}  Element where class will be toggled
-      * @param  {string}  Class name that will be prefixed and toggled
-      * @param  {boolean} Optional boolean that determines if class will be added or removed
-      * @return {jQuery}
-      */
-   
-   
-     function toggleClass($element, className, shouldAdd) {
-       return $element.toggleClass(prefixed(className), shouldAdd);
-     }
-     /**
-      * jQuery.toggleHidden
-      * @param  {jQuery}  Element where attribute will be set
-      * @param  {boolean} Boolean that determines if aria-hidden will be true or false
-      * @return {jQuery}
-      */
-   
-   
-     function toggleHidden($element, isHidden) {
-       return $element.attr('aria-hidden', isHidden).attr('tabIndex', isHidden ? -1 : 0);
-     }
-     /**
-      * Create a new DOM element wrapped in a jQuery object,
-      * decorated with our custom methods.
-      * @param  {string} className
-      * @param  {string} [tag]
-      * @return {jQuery}
-      */
-   
-   
-     function dom(className, tag) {
-       return addClass($(document.createElement(tag || 'div')), className);
-     }
-   
-     function svgDataUri(width, height) {
-       var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + width + '" height="' + height + '"/>';
-       return 'data:image/svg+xml;charset=utf-8,' + encodeURI(svg);
-     } // Compute some dimensions manually for iOS < 8, because of buggy support for VH.
-     // Also, Android built-in browser does not support viewport units.
-   
-   
-     (function () {
-       var ua = window.navigator.userAgent;
-       var iOSRegex = /(iPhone|iPad|iPod);[^OS]*OS (\d)/;
-       var iOSMatches = ua.match(iOSRegex);
-       var android = ua.indexOf('Android ') > -1 && ua.indexOf('Chrome') === -1;
-   
-       if (!android && (!iOSMatches || iOSMatches[2] > 7)) {
-         return;
-       }
-   
-       var styleNode = document.createElement('style');
-       document.head.appendChild(styleNode);
-       window.addEventListener('resize', refresh, true);
-   
-       function refresh() {
-         var vh = window.innerHeight;
-         var vw = window.innerWidth;
-         var content = '.w-lightbox-content, .w-lightbox-view, .w-lightbox-view:before {' + 'height:' + vh + 'px' + '}' + '.w-lightbox-view {' + 'width:' + vw + 'px' + '}' + '.w-lightbox-group, .w-lightbox-group .w-lightbox-view, .w-lightbox-group .w-lightbox-view:before {' + 'height:' + 0.86 * vh + 'px' + '}' + '.w-lightbox-image {' + 'max-width:' + vw + 'px;' + 'max-height:' + vh + 'px' + '}' + '.w-lightbox-group .w-lightbox-image {' + 'max-height:' + 0.86 * vh + 'px' + '}' + '.w-lightbox-strip {' + 'padding: 0 ' + 0.01 * vh + 'px' + '}' + '.w-lightbox-item {' + 'width:' + 0.1 * vh + 'px;' + 'padding:' + 0.02 * vh + 'px ' + 0.01 * vh + 'px' + '}' + '.w-lightbox-thumbnail {' + 'height:' + 0.1 * vh + 'px' + '}' + '@media (min-width: 768px) {' + '.w-lightbox-content, .w-lightbox-view, .w-lightbox-view:before {' + 'height:' + 0.96 * vh + 'px' + '}' + '.w-lightbox-content {' + 'margin-top:' + 0.02 * vh + 'px' + '}' + '.w-lightbox-group, .w-lightbox-group .w-lightbox-view, .w-lightbox-group .w-lightbox-view:before {' + 'height:' + 0.84 * vh + 'px' + '}' + '.w-lightbox-image {' + 'max-width:' + 0.96 * vw + 'px;' + 'max-height:' + 0.96 * vh + 'px' + '}' + '.w-lightbox-group .w-lightbox-image {' + 'max-width:' + 0.823 * vw + 'px;' + 'max-height:' + 0.84 * vh + 'px' + '}' + '}';
-         styleNode.textContent = content;
-       }
-   
-       refresh();
-     })();
-   
-     return lightbox;
-   }
-   
-   Webflow.define('lightbox', module.exports = function ($) {
-     var api = {};
-     var inApp = Webflow.env();
-     var lightbox = createLightbox(window, document, $, inApp ? '#lightbox-mountpoint' : 'body');
-     var $doc = $(document);
-     var $lightboxes;
-     var designer;
-     var namespace = '.w-lightbox';
-     var groups; // -----------------------------------
-     // Module methods
-   
-     api.ready = api.design = api.preview = init; // -----------------------------------
-     // Private methods
-   
-     function init() {
-       designer = inApp && Webflow.env('design'); // Reset Lightbox
-   
-       lightbox.destroy(); // Reset groups
-   
-       groups = {}; // Find all instances on the page
-   
-       $lightboxes = $doc.find(namespace); // Instantiate all lighboxes
-   
-       $lightboxes.webflowLightBox(); // Set accessibility properties that are useful prior
-       // to a lightbox being opened
-   
-       $lightboxes.each(function () {
-         setAriaLabelIfEmpty($(this), 'open lightbox');
-         $(this).attr('aria-haspopup', 'dialog');
-       });
-     }
-   
-     jQuery.fn.extend({
-       webflowLightBox: function webflowLightBox() {
-         var $el = this;
-         $.each($el, function (i, el) {
-           // Store state in data
-           var data = $.data(el, namespace);
-   
-           if (!data) {
-             data = $.data(el, namespace, {
-               el: $(el),
-               mode: 'images',
-               images: [],
-               embed: ''
-             });
-           } // Remove old events
-   
-   
-           data.el.off(namespace); // Set config from json script tag
-   
-           configure(data); // Add events based on mode
-   
-           if (designer) {
-             data.el.on('setting' + namespace, configure.bind(null, data));
-           } else {
-             data.el.on('click' + namespace, clickHandler(data)) // Prevent page scrolling to top when clicking on lightbox triggers.
-             .on('click' + namespace, function (e) {
-               e.preventDefault();
-             });
-           }
-         });
-       }
-     });
-   
-     function configure(data) {
-       var json = data.el.children('.w-json').html();
-       var groupName;
-       var groupItems;
-   
-       if (!json) {
-         data.items = [];
-         return;
-       }
-   
-       try {
-         json = JSON.parse(json);
-       } catch (e) {
-         console.error('Malformed lightbox JSON configuration.', e);
-       }
-   
-       supportOldLightboxJson(json);
-       json.items.forEach(function (item) {
-         item.$el = data.el;
-       });
-       groupName = json.group;
-   
-       if (groupName) {
-         groupItems = groups[groupName];
-   
-         if (!groupItems) {
-           groupItems = groups[groupName] = [];
-         }
-   
-         data.items = groupItems;
-   
-         if (json.items.length) {
-           data.index = groupItems.length;
-           groupItems.push.apply(groupItems, json.items);
-         }
-       } else {
-         data.items = json.items;
-         data.index = 0;
-       }
-     }
-   
-     function clickHandler(data) {
-       return function () {
-         data.items.length && lightbox(data.items, data.index || 0);
-       };
-     }
-   
-     function supportOldLightboxJson(data) {
-       if (data.images) {
-         data.images.forEach(function (item) {
-           item.type = 'image';
-         });
-         data.items = data.images;
-       }
-   
-       if (data.embed) {
-         data.embed.type = 'video';
-         data.items = [data.embed];
-       }
-   
-       if (data.groupId) {
-         data.group = data.groupId;
-       }
-     } // Export module
-   
-   
-     return api;
-   });
-   
-   /***/ }),
-   /* 20 */
-   /***/ (function(module, exports, __webpack_require__) {
-   
-   "use strict";
-    // @wf-will-never-add-flow-to-this-file
-   
    /* globals window, document */
    
    /* eslint-disable no-var */
@@ -4555,7 +3775,7 @@
    
    var Webflow = __webpack_require__(0);
    
-   var IXEvents = __webpack_require__(21);
+   var IXEvents = __webpack_require__(20);
    
    var KEY_CODES = {
      ARROW_LEFT: 37,
@@ -5138,7 +4358,7 @@
    });
    
    /***/ }),
-   /* 21 */
+   /* 20 */
    /***/ (function(module, exports, __webpack_require__) {
    
    "use strict";
@@ -5150,7 +4370,7 @@
    // eslint-disable-next-line strict
    
    
-   var IXEvents = __webpack_require__(22);
+   var IXEvents = __webpack_require__(21);
    
    function dispatchCustomEvent(element, eventName) {
      var event = document.createEvent('CustomEvent');
@@ -5187,7 +4407,7 @@
    module.exports = api;
    
    /***/ }),
-   /* 22 */
+   /* 21 */
    /***/ (function(module, exports, __webpack_require__) {
    
    "use strict";
@@ -5265,6 +4485,225 @@
    
    api.async();
    module.exports = api;
+   
+   /***/ }),
+   /* 22 */
+   /***/ (function(module, exports, __webpack_require__) {
+   
+   "use strict";
+    // @wf-will-never-add-flow-to-this-file
+   
+   /* globals window, document */
+   
+   /* eslint-disable no-var */
+   
+   /**
+    * Webflow: Maps widget
+    */
+   
+   var Webflow = __webpack_require__(0);
+   
+   Webflow.define('maps', module.exports = function ($, _) {
+     var api = {};
+     var $doc = $(document);
+     var google = null;
+     var $maps;
+     var namespace = '.w-widget-map'; // The API key is injected here from the Webflow Integrations tab on the site's dashboard
+   
+     var googleMapsApiKey = ''; // -----------------------------------
+     // Module methods
+   
+     api.ready = function () {
+       // Init Maps on the front-end
+       if (!Webflow.env()) {
+         initMaps();
+       }
+     };
+   
+     api.destroy = removeListeners; // -----------------------------------
+     // Private methods
+   
+     function initMaps() {
+       $maps = $doc.find(namespace);
+   
+       if (!$maps.length) {
+         return;
+       }
+   
+       if (google === null) {
+         $.getScript('https://maps.googleapis.com/maps/api/js?v=3.31&sensor=false&callback=_wf_maps_loaded&key=' + googleMapsApiKey);
+         window._wf_maps_loaded = mapsLoaded;
+       } else {
+         mapsLoaded();
+       }
+   
+       function mapsLoaded() {
+         window._wf_maps_loaded = function () {};
+   
+         google = window.google;
+         $maps.each(renderMap);
+         removeListeners();
+         addListeners();
+       }
+     }
+   
+     function removeListeners() {
+       Webflow.resize.off(resizeMaps);
+       Webflow.redraw.off(resizeMaps);
+     }
+   
+     function addListeners() {
+       Webflow.resize.on(resizeMaps);
+       Webflow.redraw.on(resizeMaps);
+     } // Render map onto each element
+   
+   
+     function renderMap(i, el) {
+       var data = $(el).data();
+       getState(el, data);
+     }
+   
+     function resizeMaps() {
+       $maps.each(resizeMap);
+     } // Resize map when window changes
+   
+   
+     function resizeMap(i, el) {
+       var state = getState(el);
+       google.maps.event.trigger(state.map, 'resize');
+       state.setMapPosition();
+     } // Store state on element data
+   
+   
+     var store = 'w-widget-map';
+   
+     function getState(el, data) {
+       var state = $.data(el, store);
+   
+       if (state) {
+         return state;
+       }
+   
+       var hasTooltip = typeof data.widgetTooltip === 'string' && data.widgetTooltip !== '';
+       var $el = $(el);
+       var title = $el.attr('title');
+       var markerTitle = 'Map pin';
+   
+       if (title && data.widgetTooltip) {
+         markerTitle = "Map pin on ".concat(title, " showing location of ").concat(data.widgetTooltip);
+       } else if (title && !data.widgetTooltip) {
+         markerTitle = "Map pin on ".concat(title);
+       } else if (!title && data.widgetTooltip) {
+         markerTitle = "Map pin showing location of ".concat(data.widgetTooltip);
+       }
+   
+       state = $.data(el, store, {
+         // Default options
+         latLng: '51.511214,-0.119824',
+         tooltip: '',
+         style: 'roadmap',
+         zoom: 12,
+         // Marker
+         marker: new google.maps.Marker({
+           draggable: false,
+           title: markerTitle
+         }),
+         // Tooltip infowindow
+         infowindow: new google.maps.InfoWindow({
+           disableAutoPan: true
+         })
+       }); // LatLng center point
+   
+       if (typeof data.widgetLatlng === 'string' && data.widgetLatlng.length !== '') {
+         state.latLng = data.widgetLatlng;
+       }
+   
+       var coords = state.latLng.split(',');
+       var latLngObj = new google.maps.LatLng(coords[0], coords[1]);
+       state.latLngObj = latLngObj; // Disable touch events
+   
+       var mapDraggable = !(Webflow.env.touch && !data.enableTouch); // Map instance
+   
+       state.map = new google.maps.Map(el, {
+         center: state.latLngObj,
+         zoom: state.zoom,
+         maxZoom: 20,
+         mapTypeControl: false,
+         panControl: false,
+         streetViewControl: false,
+         scrollwheel: data.enableScroll,
+         draggable: mapDraggable,
+         zoomControl: true,
+         zoomControlOptions: {
+           style: google.maps.ZoomControlStyle.SMALL
+         },
+         mapTypeId: state.style
+       });
+       state.marker.setMap(state.map); // Set map position and offset
+   
+       state.setMapPosition = function () {
+         state.map.setCenter(state.latLngObj);
+         var offsetX = 0;
+         var offsetY = 0;
+         var padding = $el.css(['paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft']);
+         offsetX -= parseInt(padding.paddingLeft, 10);
+         offsetX += parseInt(padding.paddingRight, 10);
+         offsetY -= parseInt(padding.paddingTop, 10);
+         offsetY += parseInt(padding.paddingBottom, 10);
+   
+         if (offsetX || offsetY) {
+           state.map.panBy(offsetX, offsetY);
+         }
+   
+         $el.css('position', ''); // Remove injected position
+       }; // Fix position after first tiles have loaded
+   
+   
+       google.maps.event.addListener(state.map, 'tilesloaded', function () {
+         google.maps.event.clearListeners(state.map, 'tilesloaded');
+         state.setMapPosition();
+       }); // Set initial position
+   
+       state.setMapPosition();
+       state.marker.setPosition(state.latLngObj);
+       state.infowindow.setPosition(state.latLngObj); // Draw tooltip
+   
+       if (hasTooltip) {
+         var tooltip = data.widgetTooltip;
+         state.tooltip = tooltip;
+         state.infowindow.setContent(tooltip);
+   
+         if (!state.infowindowOpen) {
+           state.infowindow.open(state.map, state.marker);
+           state.infowindowOpen = true;
+         }
+       } // Map style - options.style
+   
+   
+       var style = data.widgetStyle;
+   
+       if (style) {
+         state.map.setMapTypeId(style);
+       } // Zoom - options.zoom
+   
+   
+       var zoom = data.widgetZoom;
+   
+       if (zoom != null) {
+         state.zoom = zoom;
+         state.map.setZoom(Number(zoom));
+       } // Click marker to open in google maps
+   
+   
+       google.maps.event.addListener(state.marker, 'click', function () {
+         window.open('https://maps.google.com/?z=' + state.zoom + '&daddr=' + state.latLng);
+       });
+       return state;
+     } // Export module
+   
+   
+     return api;
+   });
    
    /***/ })
    /******/ ]);
