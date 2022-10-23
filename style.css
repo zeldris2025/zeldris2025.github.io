@@ -3358,7 +3358,7 @@ figcaption {
   }
 
   .navigation-item:hover {
-    background-color: #f7f8f9;
+    background-color: #afafaf;
   }
 
   .navigation-item:active {
@@ -3377,7 +3377,7 @@ figcaption {
     background-color: #fff;
   }
   .navigation-items:hover{
-    background-color: black;
+    background-color:#fff;
     color: black;
   }
 
